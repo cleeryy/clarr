@@ -19,9 +19,6 @@ archives:
   - id: clarr
     name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
     format: tar.gz
-    format_overrides:
-      - goos: windows
-        format: zip
 
 dockers:
   - id: clarr-amd64
@@ -31,8 +28,6 @@ dockers:
       - ghcr.io/cleeryy/clarr:{{ .Version }}-amd64
       - ghcr.io/cleeryy/clarr:latest-amd64
     dockerfile: Dockerfile.goreleaser
-    build_flag_templates:
-      - --platform=linux/amd64
 
   - id: clarr-arm64
     goos: linux
@@ -41,8 +36,6 @@ dockers:
       - ghcr.io/cleeryy/clarr:{{ .Version }}-arm64
       - ghcr.io/cleeryy/clarr:latest-arm64
     dockerfile: Dockerfile.goreleaser
-    build_flag_templates:
-      - --platform=linux/arm64
 
 docker_manifests:
   - name_template: ghcr.io/cleeryy/clarr:{{ .Version }}
