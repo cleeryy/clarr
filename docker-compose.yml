@@ -1,0 +1,29 @@
+services:
+  clarr:
+    build: .
+    container_name: clarr
+    restart: unless-stopped
+    ports:
+      - "8090:8090"
+    environment:
+      - CLARR_SERVER_HOST=0.0.0.0
+      - CLARR_SERVER_PORT=8090
+      - CLARR_JELLYFIN_WEBHOOK_SECRET=${CLARR_JELLYFIN_WEBHOOK_SECRET}
+      - CLARR_RADARR_URL=${CLARR_RADARR_URL}
+      - CLARR_RADARR_API_KEY=${CLARR_RADARR_API_KEY}
+      - CLARR_SONARR_URL=${CLARR_SONARR_URL}
+      - CLARR_SONARR_API_KEY=${CLARR_SONARR_API_KEY}
+      - CLARR_QBITTORRENT_URL=${CLARR_QBITTORRENT_URL}
+      - CLARR_QBITTORRENT_USERNAME=${CLARR_QBITTORRENT_USERNAME}
+      - CLARR_QBITTORRENT_PASSWORD=${CLARR_QBITTORRENT_PASSWORD}
+      - CLARR_CLEANER_DOWNLOAD_DIR=${CLARR_CLEANER_DOWNLOAD_DIR}
+      - CLARR_CLEANER_DRY_RUN=${CLARR_CLEANER_DRY_RUN:-true}
+      - CLARR_CLEANER_SCHEDULE=${CLARR_CLEANER_SCHEDULE:-0 3 * * *}
+    volumes:
+      - /content/downloads:/content/downloads:rw
+    networks:
+      - arr-network
+
+networks:
+  arr-network:
+    external: true
