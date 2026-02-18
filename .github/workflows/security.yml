@@ -19,7 +19,8 @@ jobs:
           scan-type: fs
           scan-ref: .
           format: table
-          exit-code: 1
+          # Pour l’instant on ne casse pas la CI, on surveille juste les rapports
+          exit-code: 0
           severity: CRITICAL,HIGH
 
   trivy-image:

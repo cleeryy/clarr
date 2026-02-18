@@ -182,6 +182,8 @@ func (h *Handler) verifySignature(c *gin.Context) error {
 		return fmt.Errorf("missing X-Jellyfin-Signature header")
 	}
 
+	// Gin: GetRawData lit le body et le remet derrière,
+	// donc on peut le relire ensuite via json.NewDecoder(c.Request.Body).
 	body, err := c.GetRawData()
 	if err != nil {
 		return fmt.Errorf("cannot read request body: %w", err)
@@ -195,10 +197,6 @@ func (h *Handler) verifySignature(c *gin.Context) error {
 		return fmt.Errorf("signature mismatch")
 	}
 
-	// Remettre le body dans le contexte pour le décodage JSON après
-	c.Request.Body = http.NoBody
-	c.Set("rawBody", body)
-
 	return nil
 }
 
@@ -208,7 +206,7 @@ func isDeleteEvent(event string) bool {
 	deleteEvents := []string{
 		"library.deleted",
 		"item.deleted",
-		"playback.stop", // Certains plugins envoient ça à la suppression
+		"playback.stop",
 	}
 	for _, e := range deleteEvents {
 		if strings.EqualFold(event, e) {
