@@ -7,12 +7,14 @@ import (
 	"path/filepath"
 	"syscall"
 
+	"github.com/cleeryy/clarr/internal/qbittorrent"
 	"go.uber.org/zap"
 )
 
 type Cleaner struct {
 	downloadDir string
 	dryRun      bool
+	qbit        *qbittorrent.Client
 	logger      *zap.Logger
 }
 
@@ -29,10 +31,11 @@ type CleanupResult struct {
 	Errors       []error
 }
 
-func New(downloadDir string, dryRun bool, logger *zap.Logger) *Cleaner {
+func New(downloadDir string, dryRun bool, qbit *qbittorrent.Client, logger *zap.Logger) *Cleaner {
 	return &Cleaner{
 		downloadDir: downloadDir,
 		dryRun:      dryRun,
+		qbit:        qbit,
 		logger:      logger,
 	}
 }
@@ -47,7 +50,6 @@ func (c *Cleaner) FindOrphans() ([]OrphanFile, error) {
 			return err
 		}
 
-		// On ignore les dossiers
 		if d.IsDir() {
 			return nil
 		}
@@ -62,7 +64,6 @@ func (c *Cleaner) FindOrphans() ([]OrphanFile, error) {
 			return fmt.Errorf("cannot read syscall stat for %s", path)
 		}
 
-		// Fichier orphelin = plus aucun hardlink ailleurs
 		if stat.Nlink == 1 {
 			orphans = append(orphans, OrphanFile{
 				Path:  path,
@@ -81,8 +82,8 @@ func (c *Cleaner) FindOrphans() ([]OrphanFile, error) {
 	return orphans, err
 }
 
-// Cleanup supprime les fichiers orphelins et les dossiers vides
-// Si DryRun == true, simule uniquement sans supprimer
+// Cleanup supprime les fichiers orphelins, notifie qBittorrent
+// et nettoie les dossiers vides
 func (c *Cleaner) Cleanup() (*CleanupResult, error) {
 	result := &CleanupResult{}
 
@@ -105,6 +106,23 @@ func (c *Cleaner) Cleanup() (*CleanupResult, error) {
 			continue
 		}
 
+		// Tentative de suppression du torrent associé dans qBittorrent
+		// On passe deleteFiles=false car on supprime le fichier nous-mêmes juste après
+		if c.qbit != nil {
+			if err := c.qbit.DeleteTorrentByPath(f.Path, false); err != nil {
+				// Non bloquant — le fichier peut ne plus avoir de torrent associé
+				c.logger.Warn("qbittorrent torrent not removed",
+					zap.String("path", f.Path),
+					zap.Error(err),
+				)
+			} else {
+				c.logger.Info("qbittorrent torrent removed",
+					zap.String("path", f.Path),
+				)
+			}
+		}
+
+		// Suppression du fichier orphelin
 		if err := os.Remove(f.Path); err != nil {
 			c.logger.Error("failed to delete orphan",
 				zap.String("path", f.Path),
