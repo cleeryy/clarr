@@ -8,7 +8,7 @@ on:
 
 jobs:
   trivy-code:
-    name: Trivy — Code Scan
+    name: Trivy — Filesystem Scan
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -39,7 +39,8 @@ jobs:
           output: trivy-results.sarif
           severity: CRITICAL,HIGH
 
-      - name: Upload results to GitHub Security
+      - name: Upload to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
+        if: always()
         with:
           sarif_file: trivy-results.sarif

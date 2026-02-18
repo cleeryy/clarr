@@ -33,8 +33,10 @@ dockers:
       - "ghcr.io/cleeryy/clarr:latest"
     dockerfile: Dockerfile
     build_flag_templates:
+      - "--label=org.opencontainers.image.title=clarr"
       - "--label=org.opencontainers.image.version={{ .Version }}"
       - "--label=org.opencontainers.image.source={{ .GitURL }}"
+      - "--label=org.opencontainers.image.licenses=MIT"
 
 changelog:
   sort: asc
@@ -45,12 +47,16 @@ changelog:
   groups:
     - title: "✨ Features"
       regexp: "^feat"
+      order: 0
     - title: "🐛 Bug Fixes"
       regexp: "^fix"
-    - title: "🔧 Chores"
-      regexp: "^chore"
+      order: 1
     - title: "🔒 Security"
       regexp: "^(ci|security)"
+      order: 2
+    - title: "🔧 Chores"
+      regexp: "^chore"
+      order: 3
 
 release:
   draft: true
