@@ -83,7 +83,7 @@ func (c *Client) do(method, endpoint string, body any) (*http.Response, error) {
 
 // ─── Series Methods ───────────────────────────────────────────────────
 
-// GetAllSeries retourne toutes les séries
+// GetAllSeries retourne toutes les séries.
 func (c *Client) GetAllSeries() ([]Series, error) {
 	resp, err := c.do(http.MethodGet, "/api/v3/series", nil)
 	if err != nil {
@@ -98,7 +98,7 @@ func (c *Client) GetAllSeries() ([]Series, error) {
 	return series, nil
 }
 
-// GetEmptySeries retourne les séries sans aucun fichier sur le disque
+// GetEmptySeries retourne les séries sans aucun fichier sur le disque.
 func (c *Client) GetEmptySeries() ([]Series, error) {
 	series, err := c.GetAllSeries()
 	if err != nil {
@@ -114,7 +114,7 @@ func (c *Client) GetEmptySeries() ([]Series, error) {
 	return empty, nil
 }
 
-// UnmonitorSeries désactive le monitoring d'une série
+// UnmonitorSeries désactive le monitoring d'une série.
 func (c *Client) UnmonitorSeries(seriesID int) error {
 	series, err := c.getSeriesByID(seriesID)
 	if err != nil {
@@ -126,14 +126,14 @@ func (c *Client) UnmonitorSeries(seriesID int) error {
 	return err
 }
 
-// DeleteSeries supprime une série de Sonarr
+// DeleteSeries supprime une série de Sonarr.
 func (c *Client) DeleteSeries(seriesID int, deleteFiles bool) error {
 	endpoint := fmt.Sprintf("/api/v3/series/%d?deleteFiles=%v&addImportExclusion=false", seriesID, deleteFiles)
 	_, err := c.do(http.MethodDelete, endpoint, nil)
 	return err
 }
 
-// RescanSeries force un rescan d'une série spécifique
+// RescanSeries force un rescan d'une série spécifique.
 func (c *Client) RescanSeries(seriesID int) error {
 	_, err := c.do(http.MethodPost, "/api/v3/command", Command{
 		Name:     "RescanSeries",
@@ -142,7 +142,7 @@ func (c *Client) RescanSeries(seriesID int) error {
 	return err
 }
 
-// RescanAll force un rescan complet de toutes les séries
+// RescanAll force un rescan complet de toutes les séries.
 func (c *Client) RescanAll() error {
 	_, err := c.do(http.MethodPost, "/api/v3/command", Command{
 		Name: "RescanSeries",
@@ -152,7 +152,7 @@ func (c *Client) RescanAll() error {
 
 // ─── Episode Methods ──────────────────────────────────────────────────
 
-// GetMissingEpisodes retourne les épisodes sans fichier d'une série
+// GetMissingEpisodes retourne les épisodes sans fichier d'une série.
 func (c *Client) GetMissingEpisodes(seriesID int) ([]Episode, error) {
 	resp, err := c.do(http.MethodGet, fmt.Sprintf("/api/v3/episode?seriesId=%d", seriesID), nil)
 	if err != nil {

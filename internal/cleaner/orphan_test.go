@@ -35,7 +35,7 @@ func TestCleanup_DryRun_DoesNotDelete(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// nil pour qbit — pas besoin en dry-run
+	// nil pour qbit — pas besoin en dry-run.
 	c := New(dir, true, nil, setupLogger(t))
 
 	result, err := c.Cleanup()
@@ -43,7 +43,7 @@ func TestCleanup_DryRun_DoesNotDelete(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	// Le fichier doit encore exister en dry-run
+	// Le fichier doit encore exister en dry-run.
 	if _, err := os.Stat(testFile); os.IsNotExist(err) {
 		t.Error("dry-run should not delete files")
 	}
@@ -61,7 +61,7 @@ func TestCleanup_DeletesOrphan(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// dry_run = false, qbit = nil
+	// dry_run = false, qbit = nil.
 	c := New(dir, false, nil, setupLogger(t))
 
 	result, err := c.Cleanup()
@@ -69,7 +69,7 @@ func TestCleanup_DeletesOrphan(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	// Le fichier doit avoir été supprimé
+	// Le fichier doit avoir été supprimé.
 	if _, err := os.Stat(testFile); !os.IsNotExist(err) {
 		t.Error("orphan file should have been deleted")
 	}

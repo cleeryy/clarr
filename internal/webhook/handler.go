@@ -44,7 +44,7 @@ func New(secret string, radarr *radarr.Client, sonarr *sonarr.Client, logger *za
 	}
 }
 
-// Register enregistre les routes webhook sur le router Gin
+// Register enregistre les routes webhook sur le router Gin.
 func (h *Handler) Register(r *gin.Engine) {
 	r.POST("/webhook/jellyfin", h.handleJellyfin)
 }
@@ -52,7 +52,7 @@ func (h *Handler) Register(r *gin.Engine) {
 // ─── Routes ───────────────────────────────────────────────────────────
 
 func (h *Handler) handleJellyfin(c *gin.Context) {
-	// Vérification de la signature HMAC si un secret est configuré
+	// Vérification de la signature HMAC si un secret est configuré.
 	if h.secret != "" {
 		if err := h.verifySignature(c); err != nil {
 			h.logger.Warn("webhook signature invalid", zap.Error(err))
@@ -74,7 +74,7 @@ func (h *Handler) handleJellyfin(c *gin.Context) {
 		zap.String("title", event.Title),
 	)
 
-	// On ne traite que les suppressions
+	// On ne traite que les suppressions.
 	if !isDeleteEvent(event.Event) {
 		c.JSON(http.StatusOK, gin.H{"status": "ignored"})
 		return
@@ -106,7 +106,7 @@ func (h *Handler) handleMovieDeleted(event JellyfinEvent) {
 		zap.String("title", event.Title),
 	)
 
-	// Force rescan Radarr pour détecter hasFile == false
+	// Force rescan Radarr pour détecter hasFile == false.
 	if err := h.radarr.RescanAll(); err != nil {
 		h.logger.Error("radarr rescan failed",
 			zap.String("title", event.Title),
@@ -115,7 +115,7 @@ func (h *Handler) handleMovieDeleted(event JellyfinEvent) {
 		return
 	}
 
-	// Récupère les films sans fichier et les unmonitor
+	// Récupère les films sans fichier et les unmonitor.
 	missing, err := h.radarr.GetMissingMovies()
 	if err != nil {
 		h.logger.Error("radarr get missing movies failed", zap.Error(err))
@@ -143,7 +143,7 @@ func (h *Handler) handleSeriesDeleted(event JellyfinEvent) {
 		zap.String("series", event.SeriesName),
 	)
 
-	// Force rescan Sonarr
+	// Force rescan Sonarr.
 	if err := h.sonarr.RescanAll(); err != nil {
 		h.logger.Error("sonarr rescan failed",
 			zap.String("title", event.Title),
@@ -152,7 +152,7 @@ func (h *Handler) handleSeriesDeleted(event JellyfinEvent) {
 		return
 	}
 
-	// Récupère les séries vides et les unmonitor
+	// Récupère les séries vides et les unmonitor.
 	empty, err := h.sonarr.GetEmptySeries()
 	if err != nil {
 		h.logger.Error("sonarr get empty series failed", zap.Error(err))

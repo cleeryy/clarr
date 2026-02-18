@@ -27,12 +27,12 @@ func New(baseURL, apiKey string) *Client {
 // ─── Models ─────────────────────────────────────────────────────────
 
 type Movie struct {
-	ID          int    `json:"id"`
-	Title       string `json:"title"`
-	HasFile     bool   `json:"hasFile"`
-	Monitored   bool   `json:"monitored"`
-	TmdbID      int    `json:"tmdbId"`
-	Path        string `json:"path"`
+	ID        int    `json:"id"`
+	Title     string `json:"title"`
+	HasFile   bool   `json:"hasFile"`
+	Monitored bool   `json:"monitored"`
+	TmdbID    int    `json:"tmdbId"`
+	Path      string `json:"path"`
 }
 
 type Command struct {
@@ -72,7 +72,7 @@ func (c *Client) do(method, endpoint string, body any) (*http.Response, error) {
 
 // ─── Methods ─────────────────────────────────────────────────────────
 
-// GetAllMovies retourne tous les films de la bibliothèque Radarr
+// GetAllMovies retourne tous les films de la bibliothèque Radarr.
 func (c *Client) GetAllMovies() ([]Movie, error) {
 	resp, err := c.do(http.MethodGet, "/api/v3/movie", nil)
 	if err != nil {
@@ -87,7 +87,7 @@ func (c *Client) GetAllMovies() ([]Movie, error) {
 	return movies, nil
 }
 
-// GetMissingMovies retourne les films où hasFile == false
+// GetMissingMovies retourne les films où hasFile == false.
 func (c *Client) GetMissingMovies() ([]Movie, error) {
 	movies, err := c.GetAllMovies()
 	if err != nil {
@@ -103,7 +103,7 @@ func (c *Client) GetMissingMovies() ([]Movie, error) {
 	return missing, nil
 }
 
-// UnmonitorMovie désactive le monitoring d'un film par son ID
+// UnmonitorMovie désactive le monitoring d'un film par son ID.
 func (c *Client) UnmonitorMovie(movieID int) error {
 	movie, err := c.getMovieByID(movieID)
 	if err != nil {
@@ -115,14 +115,14 @@ func (c *Client) UnmonitorMovie(movieID int) error {
 	return err
 }
 
-// DeleteMovie supprime un film de Radarr (et optionnellement ses fichiers)
+// DeleteMovie supprime un film de Radarr (et optionnellement ses fichiers).
 func (c *Client) DeleteMovie(movieID int, deleteFiles bool) error {
 	endpoint := fmt.Sprintf("/api/v3/movie/%d?deleteFiles=%v&addImportExclusion=false", movieID, deleteFiles)
 	_, err := c.do(http.MethodDelete, endpoint, nil)
 	return err
 }
 
-// RescanMovie force un rescan du fichier d'un film
+// RescanMovie force un rescan du fichier d'un film.
 func (c *Client) RescanMovie(movieID int) error {
 	_, err := c.do(http.MethodPost, "/api/v3/command", Command{
 		Name:    "RescanMovie",
@@ -131,7 +131,7 @@ func (c *Client) RescanMovie(movieID int) error {
 	return err
 }
 
-// RescanAll force un rescan complet de toute la bibliothèque
+// RescanAll force un rescan complet de toute la bibliothèque.
 func (c *Client) RescanAll() error {
 	_, err := c.do(http.MethodPost, "/api/v3/command", Command{
 		Name: "RescanMovie",

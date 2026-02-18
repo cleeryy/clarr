@@ -40,8 +40,8 @@ func New(downloadDir string, dryRun bool, qbit *qbittorrent.Client, logger *zap.
 	}
 }
 
-// FindOrphans parcourt le downloadDir et retourne les fichiers
-// avec un link count == 1 (plus aucun hardlink dans movies/ ou tv/)
+// FindOrphans parcourt le downloadDir et retourne les fichiers.
+// avec un link count == 1 (plus aucun hardlink dans movies/ ou tv/).
 func (c *Cleaner) FindOrphans() ([]OrphanFile, error) {
 	var orphans []OrphanFile
 
@@ -82,8 +82,8 @@ func (c *Cleaner) FindOrphans() ([]OrphanFile, error) {
 	return orphans, err
 }
 
-// Cleanup supprime les fichiers orphelins, notifie qBittorrent
-// et nettoie les dossiers vides
+// Cleanup supprime les fichiers orphelins, notifie qBittorrent.
+// et nettoie les dossiers vides.
 func (c *Cleaner) Cleanup() (*CleanupResult, error) {
 	result := &CleanupResult{}
 
@@ -106,11 +106,11 @@ func (c *Cleaner) Cleanup() (*CleanupResult, error) {
 			continue
 		}
 
-		// Tentative de suppression du torrent associé dans qBittorrent
-		// On passe deleteFiles=false car on supprime le fichier nous-mêmes juste après
+		// Tentative de suppression du torrent associé dans qBittorrent.
+		// On passe deleteFiles=false car on supprime le fichier nous-mêmes juste après.
 		if c.qbit != nil {
 			if err := c.qbit.DeleteTorrentByPath(f.Path, false); err != nil {
-				// Non bloquant — le fichier peut ne plus avoir de torrent associé
+				// Non bloquant — le fichier peut ne plus avoir de torrent associé.
 				c.logger.Warn("qbittorrent torrent not removed",
 					zap.String("path", f.Path),
 					zap.Error(err),
@@ -122,7 +122,7 @@ func (c *Cleaner) Cleanup() (*CleanupResult, error) {
 			}
 		}
 
-		// Suppression du fichier orphelin
+		// Suppression du fichier orphelin.
 		if err := os.Remove(f.Path); err != nil {
 			c.logger.Error("failed to delete orphan",
 				zap.String("path", f.Path),
@@ -139,7 +139,7 @@ func (c *Cleaner) Cleanup() (*CleanupResult, error) {
 		result.FreedBytes += f.Size
 	}
 
-	// Nettoyage des dossiers vides après suppression des fichiers
+	// Nettoyage des dossiers vides après suppression des fichiers.
 	if !c.dryRun {
 		if err := c.removeEmptyDirs(); err != nil {
 			c.logger.Warn("failed to remove empty dirs", zap.Error(err))
@@ -156,7 +156,7 @@ func (c *Cleaner) Cleanup() (*CleanupResult, error) {
 	return result, nil
 }
 
-// FreedBytesHuman retourne la taille libérée en format lisible
+// FreedBytesHuman retourne la taille libérée en format lisible.
 func (r *CleanupResult) FreedBytesHuman() string {
 	const unit = 1024
 	b := r.FreedBytes

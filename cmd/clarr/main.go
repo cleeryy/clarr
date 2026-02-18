@@ -25,7 +25,7 @@ var version = "dev"
 func main() {
 	// ─── Logger ───────────────────────────────────────────────────────
 	logger, _ := zap.NewProduction()
-	defer logger.Sync()
+	defer func() { _ = logger.Sync() }()
 
 	logger.Info("starting clarr", zap.String("version", version))
 
@@ -83,7 +83,7 @@ func main() {
 	r.Use(gin.Recovery())
 	r.Use(ginZapLogger(logger))
 
-	// Health check
+	// Health check.
 	r.GET("/health", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{
 			"status":  "ok",
@@ -92,11 +92,11 @@ func main() {
 		})
 	})
 
-	// Webhook Jellyfin
+	// Webhook Jellyfin.
 	webhookHandler := webhook.New(cfg.Jellyfin.WebhookSecret, radarrClient, sonarrClient, logger)
 	webhookHandler.Register(r)
 
-	// Cleanup manuel via API
+	// Cleanup manuel via API.
 	r.POST("/api/cleanup", func(ctx *gin.Context) {
 		go func() {
 			result, err := cleanerSvc.Cleanup()
@@ -112,7 +112,7 @@ func main() {
 		ctx.JSON(http.StatusAccepted, gin.H{"status": "cleanup started"})
 	})
 
-	// Rescan manuel Radarr + Sonarr
+	// Rescan manuel Radarr + Sonarr.
 	r.POST("/api/rescan", func(ctx *gin.Context) {
 		go func() {
 			if err := radarrClient.RescanAll(); err != nil {
@@ -126,7 +126,7 @@ func main() {
 		ctx.JSON(http.StatusAccepted, gin.H{"status": "rescan started"})
 	})
 
-	// Stats disque
+	// Stats disque.
 	r.GET("/api/stats", func(ctx *gin.Context) {
 		orphans, err := cleanerSvc.FindOrphans()
 		if err != nil {
@@ -166,7 +166,7 @@ func main() {
 		}
 	}()
 
-	// Attendre signal OS (SIGINT, SIGTERM)
+	// Attendre signal OS (SIGINT, SIGTERM).
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
