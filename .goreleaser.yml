@@ -25,27 +25,9 @@ dockers:
     goos: linux
     goarch: amd64
     image_templates:
-      - ghcr.io/cleeryy/clarr:{{ .Version }}-amd64
-      - ghcr.io/cleeryy/clarr:latest-amd64
+      - ghcr.io/cleeryy/clarr:{{ .Version }}
+      - ghcr.io/cleeryy/clarr:latest
     dockerfile: Dockerfile.goreleaser
-
-  - id: clarr-arm64
-    goos: linux
-    goarch: arm64
-    image_templates:
-      - ghcr.io/cleeryy/clarr:{{ .Version }}-arm64
-      - ghcr.io/cleeryy/clarr:latest-arm64
-    dockerfile: Dockerfile.goreleaser
-
-docker_manifests:
-  - name_template: ghcr.io/cleeryy/clarr:{{ .Version }}
-    image_templates:
-      - ghcr.io/cleeryy/clarr:{{ .Version }}-amd64
-      - ghcr.io/cleeryy/clarr:{{ .Version }}-arm64
-  - name_template: ghcr.io/cleeryy/clarr:latest
-    image_templates:
-      - ghcr.io/cleeryy/clarr:latest-amd64
-      - ghcr.io/cleeryy/clarr:latest-arm64
 
 changelog:
   sort: asc
