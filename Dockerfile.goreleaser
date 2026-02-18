@@ -1,0 +1,11 @@
+FROM gcr.io/distroless/static:nonroot
+
+WORKDIR /app
+
+COPY clarr .
+
+USER nonroot:nonroot
+
+EXPOSE 8090
+
+ENTRYPOINT ["/app/clarr"]
