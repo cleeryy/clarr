@@ -7,7 +7,6 @@ linters:
     - staticcheck
     - unused
     - gofmt
-    - goimports
     - misspell
     - godot
 

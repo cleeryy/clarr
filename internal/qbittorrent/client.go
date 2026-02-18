@@ -76,7 +76,7 @@ func (c *Client) login() error {
 
 // ─── Methods ──────────────────────────────────────────────────────────
 
-// GetTorrents retourne tous les torrents (optionnellement filtrés par état)
+// GetTorrents retourne tous les torrents (optionnellement filtrés par état).
 func (c *Client) GetTorrents(filter string) ([]Torrent, error) {
 	endpoint := "/api/v2/torrents/info"
 	if filter != "" {
@@ -96,13 +96,13 @@ func (c *Client) GetTorrents(filter string) ([]Torrent, error) {
 	return torrents, nil
 }
 
-// GetPausedTorrents retourne uniquement les torrents en pause (seeding terminé)
+// GetPausedTorrents retourne uniquement les torrents en pause (seeding terminé).
 func (c *Client) GetPausedTorrents() ([]Torrent, error) {
 	return c.GetTorrents("paused")
 }
 
-// DeleteTorrent supprime un torrent par son hash
-// deleteFiles = true supprime aussi les fichiers du disque
+// DeleteTorrent supprime un torrent par son hash.
+// deleteFiles = true supprime aussi les fichiers du disque.
 func (c *Client) DeleteTorrent(hash string, deleteFiles bool) error {
 	resp, err := c.httpClient.PostForm(c.baseURL+"/api/v2/torrents/delete", url.Values{
 		"hashes":      {hash},
@@ -115,7 +115,7 @@ func (c *Client) DeleteTorrent(hash string, deleteFiles bool) error {
 	return nil
 }
 
-// DeleteTorrentByPath supprime le torrent dont le path correspond
+// DeleteTorrentByPath supprime le torrent dont le path correspond.
 func (c *Client) DeleteTorrentByPath(filePath string, deleteFiles bool) error {
 	torrents, err := c.GetTorrents("")
 	if err != nil {
@@ -131,7 +131,7 @@ func (c *Client) DeleteTorrentByPath(filePath string, deleteFiles bool) error {
 	return fmt.Errorf("qbittorrent: no torrent found for path %s", filePath)
 }
 
-// PauseTorrent met en pause un torrent par son hash
+// PauseTorrent met en pause un torrent par son hash.
 func (c *Client) PauseTorrent(hash string) error {
 	resp, err := c.httpClient.PostForm(c.baseURL+"/api/v2/torrents/pause", url.Values{
 		"hashes": {hash},
