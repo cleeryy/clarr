@@ -1,0 +1,24 @@
+server:
+  port: 8090
+  host: "0.0.0.0"
+
+jellyfin:
+  webhook_secret: "changeme"
+
+radarr:
+  url: "http://radarr:7878"
+  api_key: "your_radarr_api_key"
+
+sonarr:
+  url: "http://sonarr:8989"
+  api_key: "your_sonarr_api_key"
+
+qbittorrent:
+  url: "http://qbittorrent:8080"
+  username: "admin"
+  password: "changeme"
+
+cleaner:
+  download_dir: "/content/downloads"
+  dry_run: true  # Mettre false pour supprimer réellement
+  schedule: "0 3 * * *"  # Cron daily 3h du matin
