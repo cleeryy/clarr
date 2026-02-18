@@ -7,8 +7,8 @@ import (
 type Config struct {
 	Server      ServerConfig      `yaml:"server"`
 	Jellyfin    JellyfinConfig    `yaml:"jellyfin"`
-	Radarr      ArrConfig         `yaml:"radarr"`
-	Sonarr      ArrConfig         `yaml:"sonarr"`
+	Radarr      RadarrConfig      `yaml:"radarr"`
+	Sonarr      SonarrConfig      `yaml:"sonarr"`
 	Qbittorrent QbittorrentConfig `yaml:"qbittorrent"`
 	Cleaner     CleanerConfig     `yaml:"cleaner"`
 }
@@ -22,9 +22,14 @@ type JellyfinConfig struct {
 	WebhookSecret string `yaml:"webhook_secret" env:"CLARR_JELLYFIN_WEBHOOK_SECRET" env-required:"true"`
 }
 
-type ArrConfig struct {
-	URL    string `yaml:"url"     env:"CLARR_RADARR_URL"`
-	APIKey string `yaml:"api_key" env:"CLARR_RADARR_API_KEY"`
+type RadarrConfig struct {
+	URL    string `yaml:"url"     env:"CLARR_RADARR_URL"     env-required:"true"`
+	APIKey string `yaml:"api_key" env:"CLARR_RADARR_API_KEY" env-required:"true"`
+}
+
+type SonarrConfig struct {
+	URL    string `yaml:"url"     env:"CLARR_SONARR_URL"     env-required:"true"`
+	APIKey string `yaml:"api_key" env:"CLARR_SONARR_API_KEY" env-required:"true"`
 }
 
 type QbittorrentConfig struct {
