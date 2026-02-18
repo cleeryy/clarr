@@ -52,10 +52,9 @@ func main() {
 	if err != nil {
 		logger.Fatal("failed to connect to qbittorrent", zap.Error(err))
 	}
-	_ = qbitClient // TODO: intégrer dans le cleaner (feat/cleaner-qbit-integration)
 
 	// ─── Cleaner ──────────────────────────────────────────────────────
-	cleanerSvc := cleaner.New(cfg.Cleaner.DownloadDir, cfg.Cleaner.DryRun, logger)
+	cleanerSvc := cleaner.New(cfg.Cleaner.DownloadDir, cfg.Cleaner.DryRun, qbitClient, logger)
 
 	// ─── Scheduler ────────────────────────────────────────────────────
 	c := cron.New()
