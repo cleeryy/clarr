@@ -1,9 +1,5 @@
 version: 2
 
-before:
-  hooks:
-    - go mod tidy
-
 builds:
   - id: clarr
     main: ./cmd/clarr/main.go
@@ -13,7 +9,6 @@ builds:
     goos:
       - linux
       - darwin
-      - windows
     goarch:
       - amd64
       - arm64
@@ -21,22 +16,43 @@ builds:
       - -s -w -X main.version={{.Version}}
 
 archives:
-  - formats: [tar.gz]
-    name_template: "clarr_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+  - id: clarr
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+    format: tar.gz
     format_overrides:
       - goos: windows
-        formats: [zip]
+        format: zip
 
 dockers:
-  - image_templates:
-      - "ghcr.io/cleeryy/clarr:{{ .Version }}"
-      - "ghcr.io/cleeryy/clarr:latest"
-    dockerfile: Dockerfile
+  - id: clarr-amd64
+    goos: linux
+    goarch: amd64
+    image_templates:
+      - ghcr.io/cleeryy/clarr:{{ .Version }}-amd64
+      - ghcr.io/cleeryy/clarr:latest-amd64
+    dockerfile: Dockerfile.goreleaser
     build_flag_templates:
-      - "--label=org.opencontainers.image.title=clarr"
-      - "--label=org.opencontainers.image.version={{ .Version }}"
-      - "--label=org.opencontainers.image.source={{ .GitURL }}"
-      - "--label=org.opencontainers.image.licenses=MIT"
+      - --platform=linux/amd64
+
+  - id: clarr-arm64
+    goos: linux
+    goarch: arm64
+    image_templates:
+      - ghcr.io/cleeryy/clarr:{{ .Version }}-arm64
+      - ghcr.io/cleeryy/clarr:latest-arm64
+    dockerfile: Dockerfile.goreleaser
+    build_flag_templates:
+      - --platform=linux/arm64
+
+docker_manifests:
+  - name_template: ghcr.io/cleeryy/clarr:{{ .Version }}
+    image_templates:
+      - ghcr.io/cleeryy/clarr:{{ .Version }}-amd64
+      - ghcr.io/cleeryy/clarr:{{ .Version }}-arm64
+  - name_template: ghcr.io/cleeryy/clarr:latest
+    image_templates:
+      - ghcr.io/cleeryy/clarr:latest-amd64
+      - ghcr.io/cleeryy/clarr:latest-arm64
 
 changelog:
   sort: asc
@@ -44,20 +60,4 @@ changelog:
     exclude:
       - "^docs:"
       - "^test:"
-  groups:
-    - title: "✨ Features"
-      regexp: "^feat"
-      order: 0
-    - title: "🐛 Bug Fixes"
-      regexp: "^fix"
-      order: 1
-    - title: "🔒 Security"
-      regexp: "^(ci|security)"
-      order: 2
-    - title: "🔧 Chores"
-      regexp: "^chore"
-      order: 3
-
-release:
-  draft: true
-  name_template: "clarr v{{.Version}}"
+      - "^chore:"
