@@ -1,0 +1,57 @@
+version: 2
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: clarr
+    main: ./cmd/clarr/main.go
+    binary: clarr
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w -X main.version={{.Version}}
+
+archives:
+  - formats: [tar.gz]
+    name_template: "clarr_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+
+dockers:
+  - image_templates:
+      - "ghcr.io/cleeryy/clarr:{{ .Version }}"
+      - "ghcr.io/cleeryy/clarr:latest"
+    dockerfile: Dockerfile
+    build_flag_templates:
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.source={{ .GitURL }}"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+  groups:
+    - title: "✨ Features"
+      regexp: "^feat"
+    - title: "🐛 Bug Fixes"
+      regexp: "^fix"
+    - title: "🔧 Chores"
+      regexp: "^chore"
+    - title: "🔒 Security"
+      regexp: "^(ci|security)"
+
+release:
+  draft: true
+  name_template: "clarr v{{.Version}}"
