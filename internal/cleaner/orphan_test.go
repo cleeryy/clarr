@@ -8,16 +8,15 @@ import (
 	"go.uber.org/zap"
 )
 
-func setupTestDir(t *testing.T) string {
+func setupLogger(t *testing.T) *zap.Logger {
 	t.Helper()
-	dir := t.TempDir()
-	return dir
+	logger, _ := zap.NewDevelopment()
+	return logger
 }
 
 func TestFindOrphans_EmptyDir(t *testing.T) {
-	dir := setupTestDir(t)
-	logger, _ := zap.NewDevelopment()
-	c := New(dir, true, logger)
+	dir := t.TempDir()
+	c := New(dir, true, nil, setupLogger(t))
 
 	orphans, err := c.FindOrphans()
 	if err != nil {
@@ -28,17 +27,16 @@ func TestFindOrphans_EmptyDir(t *testing.T) {
 	}
 }
 
-func TestCleanup_DryRun(t *testing.T) {
-	dir := setupTestDir(t)
+func TestCleanup_DryRun_DoesNotDelete(t *testing.T) {
+	dir := t.TempDir()
 
-	// Créer un fichier de test (links == 1 par défaut)
 	testFile := filepath.Join(dir, "test.mkv")
 	if err := os.WriteFile(testFile, []byte("fake video content"), 0644); err != nil {
 		t.Fatal(err)
 	}
 
-	logger, _ := zap.NewDevelopment()
-	c := New(dir, true, logger) // dry_run = true
+	// nil pour qbit — pas besoin en dry-run
+	c := New(dir, true, nil, setupLogger(t))
 
 	result, err := c.Cleanup()
 	if err != nil {
@@ -52,6 +50,36 @@ func TestCleanup_DryRun(t *testing.T) {
 
 	if result.ScannedFiles != 1 {
 		t.Errorf("expected 1 scanned file, got %d", result.ScannedFiles)
+	}
+}
+
+func TestCleanup_DeletesOrphan(t *testing.T) {
+	dir := t.TempDir()
+
+	testFile := filepath.Join(dir, "orphan.mkv")
+	if err := os.WriteFile(testFile, []byte("fake video content"), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	// dry_run = false, qbit = nil
+	c := New(dir, false, nil, setupLogger(t))
+
+	result, err := c.Cleanup()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	// Le fichier doit avoir été supprimé
+	if _, err := os.Stat(testFile); !os.IsNotExist(err) {
+		t.Error("orphan file should have been deleted")
+	}
+
+	if len(result.Errors) != 0 {
+		t.Errorf("expected no errors, got %d", len(result.Errors))
+	}
+
+	if result.FreedBytes == 0 {
+		t.Error("expected freed bytes > 0")
 	}
 }
 
