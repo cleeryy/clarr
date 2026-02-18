@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - "v*.*.*"
+    branches: [main]
 
 jobs:
   release:
@@ -21,7 +22,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.24"
+          go-version-file: go.mod
           cache: true
 
       - name: Log in to GitHub Container Registry
